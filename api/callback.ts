@@ -66,10 +66,11 @@ function renderBody(
       document.getElementById("status").textContent = ${statusText};
       if (window.opener) {
         const receiveMessage = (message) => {
+          if (message.data !== ${handshake}) return;
           window.opener.postMessage(${payload}, message.origin);
           window.removeEventListener("message", receiveMessage, false);
           if (${JSON.stringify(status)} === "success") {
-            setTimeout(() => window.close(), 150);
+            setTimeout(() => window.close(), 1000);
           }
         };
         window.addEventListener("message", receiveMessage, false);
