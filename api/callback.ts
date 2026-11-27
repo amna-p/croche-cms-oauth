@@ -53,19 +53,29 @@ function renderBody(
     `authorization:${provider}:${status}:${JSON.stringify(content)}`
   );
   const handshake = JSON.stringify(`authorizing:${provider}`);
+  const statusText = JSON.stringify(
+    status === "success"
+      ? "Login successful! Returning to CMS..."
+      : `Authentication error: ${String(content.message || "Unknown error")}`
+  );
   return `<!doctype html>
 <html>
-  <body>
+  <body style="font-family: system-ui, sans-serif; padding: 24px; color: #28231E;">
+    <p id="status"></p>
     <script>
+      document.getElementById("status").textContent = ${statusText};
       if (window.opener) {
         const receiveMessage = (message) => {
           window.opener.postMessage(${payload}, message.origin);
           window.removeEventListener("message", receiveMessage, false);
+          if (${JSON.stringify(status)} === "success") {
+            window.close();
+          }
         };
         window.addEventListener("message", receiveMessage, false);
         window.opener.postMessage(${handshake}, "*");
       } else {
-        document.body.textContent =
+        document.getElementById("status").textContent =
           "No opener window found. Please start login from /admin.";
       }
     </script>
