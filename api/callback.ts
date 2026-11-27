@@ -20,8 +20,13 @@
           redirect_uri: `https://${host}/callback?provider=${provider}`,     
         };                                                                   
                                                                              
-        const accessToken = await client.getToken(tokenParams);
-        const token = accessToken.token["access_token"] as string;           
+       const accessToken = await client.getToken(tokenParams);
+        const token = accessToken.token["access_token"] as string | undefined;
+  
+        if (!token) {
+          throw new Error(`No access_token from GitHub: ${JSON.stringify(accessToken.token)}`);
+        }
+        
   
         const responseBody = renderBody("success", provider, {
           token,
