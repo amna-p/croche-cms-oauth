@@ -43,27 +43,33 @@
       }
     };
   
-    function renderBody(
-      status: string, 
+function renderBody(
+      status: string,
       provider: string,
       content: Record<string, unknown>
     ) {
-      return `<!doctype html> 
+      const payload = JSON.stringify(
+        `authorization:${provider}:${status}:${JSON.stringify(content)}`     
+      );
+      return `<!doctype html>
     <html>
-      <body>
-        <script>
-          const receiveMessage = (message) => { 
-            window.opener.postMessage( 
-              'authorization:${provider}:${status}:${JSON.stringify(content)}
-              ',
-              message.origin
-            );
-            window.removeEventListener("message", receiveMessage, false); 
-          }; 
-          window.addEventListener("message", receiveMessage, false);
-          window.opener.postMessage("authorizing:${provider}", "*");
+      <body> 
+        <script> 
+          if (window.opener) {
+            const receiveMessage = (message) => { 
+              window.opener.postMessage(${payload}, message.origin);
+              window.removeEventListener("message", receiveMessage, false);
+            };
+            window.addEventListener("message", receiveMessage, false); 
+            window.opener.postMessage(${JSON.stringify(`authorizing:${provide
+            r}`)}, "*"); 
+          } else {
+            document.body.textContent = "No opener window found. Please start
+            login from /admin.";
+          }
         </script> 
-      </body>
+      </body> 
     </html>`;
     }
+
   
