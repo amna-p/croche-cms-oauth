@@ -69,7 +69,7 @@ function renderBody(
           window.opener.postMessage(${payload}, message.origin);
           window.removeEventListener("message", receiveMessage, false);
           if (${JSON.stringify(status)} === "success") {
-            window.close();
+            setTimeout(() => window.close(), 150);
           }
         };
         window.addEventListener("message", receiveMessage, false);
